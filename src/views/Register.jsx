@@ -1,18 +1,26 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    nombre: '',
-    apellido: '',
-    correo: '',
-    clave: '',
-    sueldomensual: '',
+    nombre: "",
+    apellido: "",
+    correo: "",
+    clave: "",
+    sueldomensual: "",
   });
 
+  const [errores, setErrores] = useState({
+    nombre: "",
+    apellido: "",
+    correo: "",
+    sueldomensual: "",
+    clave: "",
+  }); //manejo de errores en form
+
   if (localStorage.getItem("sessionId")) {
-    window.location.href = '/';
+    window.location.href = "/";
   }
 
   const handleChange = (e) => {
@@ -24,7 +32,7 @@ const Register = () => {
   };
 
   const showToast = () => {
-    toast.success('Usuario registrado exitosamente!', {
+    toast.success("Usuario registrado exitosamente!", {
       position: "top-right",
       autoClose: 1500,
       hideProgressBar: false,
@@ -39,25 +47,59 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch('http://localhost/serverWiseApp/registrarUsuario.php', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 1200);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    let nuevosErrores = {}; // Objeto para almacenar los posibles errores
 
-    showToast();
+    // Validación para el nombre
+    if (!formData.nombre.trim()) {
+      nuevosErrores.nombre = "El nombre es requerido";
+    }
+
+    // Validación para el apellido
+    if (!formData.apellido.trim()) {
+      nuevosErrores.apellido = "El apellido es requerido";
+    }
+
+    // Validación para el correo
+    if (!formData.correo.trim()) {
+      nuevosErrores.correo = "El mail es requerido y debe de ser valido";
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.correo)
+    ) {
+      nuevosErrores.correo = "Por favor ingrese un correo electrónico válido";
+    }
+
+    // Validación para el mensaje
+    if (!formData.clave.trim()) {
+      nuevosErrores.clave = "Debe cargar una Contraseña";
+    }
+
+    // Validación para el mensaje
+    if (!formData.sueldomensual.trim()) {
+      nuevosErrores.sueldomensual = "Debe cargar un sueldo mensual";
+    }
+
+    setErrores(nuevosErrores); // Actualiza el estado de errores con los nuevos errores
+    if (Object.keys(nuevosErrores).length === 0) {
+      fetch("http://localhost/serverWiseApp/registrarUsuario.php", {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1200);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      showToast();
+    }
   };
 
   return (
@@ -83,11 +125,14 @@ const Register = () => {
                         name="nombre"
                         value={formData.nombre}
                         onChange={handleChange}
-                        required
+                        // required
                       />
-                      <label htmlFor="inputNombre">
-                        Ingrese su nombre
-                      </label>
+                      {errores.nombre && ( // mensaje de error si no pasa la validacion
+                        <div className="invalid-feedback d-block">
+                          {errores.nombre}
+                        </div>
+                      )}
+                      <label htmlFor="inputNombre">Ingrese su nombre</label>
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -100,11 +145,14 @@ const Register = () => {
                         name="apellido"
                         value={formData.apellido}
                         onChange={handleChange}
-                        required
+                        // required
                       />
-                      <label htmlFor="inputApellido">
-                        Ingrese su apellido
-                      </label>
+                      {errores.apellido && ( // mensaje de error si no pasa la validacion
+                        <div className="invalid-feedback d-block">
+                          {errores.apellido}
+                        </div>
+                      )}
+                      <label htmlFor="inputApellido">Ingrese su apellido</label>
                     </div>
                   </div>
                 </div>
@@ -119,8 +167,13 @@ const Register = () => {
                         name="sueldomensual"
                         value={formData.sueldomensual}
                         onChange={handleChange}
-                        required
+                        // required
                       />
+                      {errores.sueldomensual && ( // mensaje de error si no pasa la validacion
+                        <div className="invalid-feedback d-block">
+                          {errores.sueldomensual}
+                        </div>
+                      )}
                       <label htmlFor="inputSueldo">
                         Ingrese su sueldo mensual
                       </label>
@@ -138,8 +191,13 @@ const Register = () => {
                         name="correo"
                         value={formData.correo}
                         onChange={handleChange}
-                        required
+                        // required
                       />
+                      {errores.correo && ( // mensaje de error si no pasa la validacion
+                        <div className="invalid-feedback d-block">
+                          {errores.correo}
+                        </div>
+                      )}
                       <label htmlFor="inputEmail">Email</label>
                     </div>
                   </div>
@@ -149,12 +207,17 @@ const Register = () => {
                         className="form-control"
                         id="clave"
                         type="password"
-                        placeholder='123'
+                        placeholder="123"
                         name="clave"
                         value={formData.clave}
                         onChange={handleChange}
-                        required
+                        // required
                       />
+                      {errores.clave && ( // mensaje de error si no pasa la validacion
+                        <div className="invalid-feedback d-block">
+                          {errores.clave}
+                        </div>
+                      )}
                       <label htmlFor="inputPassword">Contraseña</label>
                     </div>
                   </div>
@@ -182,7 +245,9 @@ const Register = () => {
             </div>
             <div className="card-footer text-center py-3">
               <div className="small">
-                <Link to="/">¿Tienes una cuenta? Click aquí para iniciar sesión.</Link>
+                <Link to="/">
+                  ¿Tienes una cuenta? Click aquí para iniciar sesión.
+                </Link>
               </div>
             </div>
           </div>

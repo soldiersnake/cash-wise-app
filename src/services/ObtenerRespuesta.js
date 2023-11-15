@@ -1,8 +1,11 @@
 export async function obtenerChatRespuesta(consultaAlChat) {
   // const api_key = process.env.REACT_APP_OpenAIApiKey;
 
-  const api_key = ''; //AQUI VA LA API_KEY
+  // const api_key = process.env.REACT_APP_API_KEY; //AQUI VA LA API_KEY
+  const api_key = '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'
   
+  console.log(api_key);
+
   const url = "https://api.openai.com/v1/chat/completions";
   
   try {
