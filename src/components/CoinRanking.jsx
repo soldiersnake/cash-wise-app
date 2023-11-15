@@ -41,6 +41,8 @@ const CoinRanking = () => {
   // Obtiene los elementos de la página actual
   const currentItems = coins.slice(indexOfFirstItem, indexOfLastItem);
 
+  console.log(currentItems);
+
   // Cambia la página
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -95,7 +97,7 @@ const CoinRanking = () => {
                     &nbsp;
                     <span className="fw-light">{coin.symbol}</span>
                   </td>
-                  <td className="align-middle">${coin.price}</td>
+                  <td className="align-middle">${coin.price ? Number(coin.price).toFixed(4) : coin.price}</td>
                   <td className="align-middle">
                     {formatMarketCap(coin.marketCap)}
                   </td>
